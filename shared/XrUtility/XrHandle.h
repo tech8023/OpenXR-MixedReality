@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <cassert>
-
 namespace xr {
 
     template <typename HandleType>

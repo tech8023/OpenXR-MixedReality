@@ -28,8 +28,6 @@ namespace xr {
         std::string string;
         string.resize(count);
         CHECK_XRCMD(xrPathToString(instance, path, count, &count, string.data()));
-        // Remove the null character
-        string.resize(count - 1);
         return string;
     }
 

@@ -4,7 +4,6 @@
 #include "pch.h"
 #include "DxUtility.h"
 #include "Trace.h"
-#include <XrUtility/XrString.h>
 
 namespace sample::dx {
     winrt::com_ptr<IDXGIAdapter1> GetAdapter(LUID adapterId) {
@@ -20,7 +19,7 @@ namespace sample::dx {
             DXGI_ADAPTER_DESC1 adapterDesc;
             CHECK_HRCMD(dxgiAdapter->GetDesc1(&adapterDesc));
             if (memcmp(&adapterDesc.AdapterLuid, &adapterId, sizeof(adapterId)) == 0) {
-                sample::Trace("Using graphics adapter {}",  xr::wide_to_utf8(adapterDesc.Description));
+                sample::Trace(L"Using graphics adapter {}", adapterDesc.Description);
                 return dxgiAdapter;
             }
         }
