@@ -30,10 +30,10 @@ namespace {
 
     struct EyeGazeInteractionScene : public engine::Scene {
         EyeGazeInteractionScene(engine::Context& context)
-            : Scene(context)
-            , m_supportsEyeGazeAction(context.Extensions.SupportsEyeGazeInteraction &&
-                                      context.System.EyeGazeInteractionProperties.supportsEyeGazeInteraction) {
-            if (m_supportsEyeGazeAction) {
+            : Scene(context) {
+            const bool supportsEyeGazeAction =
+                context.Extensions.SupportsEyeGazeInteraction && context.System.EyeGazeInteractionProperties.supportsEyeGazeInteraction;
+            if (supportsEyeGazeAction) {
                 sample::ActionSet& actionSet =
                     ActionContext().CreateActionSet("eye_gaze_interaction_scene_actions", "Eye Gaze Interaction Scene Actions");
 
@@ -47,13 +47,13 @@ namespace {
                 XrActionSpaceCreateInfo createInfo{XR_TYPE_ACTION_SPACE_CREATE_INFO};
                 createInfo.action = gazeAction;
                 createInfo.poseInActionSpace = Pose::Identity();
-                CHECK_XRCMD(xrCreateActionSpace(m_context.Session.Handle, &createInfo, m_gazeSpace.Put(xrDestroySpace)));
+                CHECK_XRCMD(xrCreateActionSpace(m_context.Session.Handle, &createInfo, m_gazeSpace.Put()));
             } else {
                 // Use VIEW reference space to simulate eye gaze when the system doesn't support
                 XrReferenceSpaceCreateInfo createInfo{XR_TYPE_REFERENCE_SPACE_CREATE_INFO};
                 createInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
                 createInfo.poseInReferenceSpace = Pose::Identity();
-                CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &createInfo, m_gazeSpace.Put(xrDestroySpace)));
+                CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &createInfo, m_gazeSpace.Put()));
             }
 
             m_gazeObject = AddObject(engine::CreateObject());
@@ -100,7 +100,6 @@ namespace {
         }
 
     private:
-        const bool m_supportsEyeGazeAction{false};
         xr::SpaceHandle m_gazeSpace;
         std::shared_ptr<engine::Object> m_gazeObject;
         std::shared_ptr<engine::Object> m_gazeLookAtAxis;

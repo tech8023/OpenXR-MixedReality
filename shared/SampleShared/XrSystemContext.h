@@ -8,7 +8,7 @@
 #include "XrUtility/XrEnumerate.h"
 #include "XrUtility/XrExtensionContext.h"
 #include "XrUtility/XrStruct.h"
-#include "XrUtility/XrViewConfiguration.h"
+#include "SampleShared/XrViewConfiguration.h"
 
 namespace sample {
     struct SystemContext {
@@ -21,7 +21,7 @@ namespace sample {
 
         std::vector<XrViewConfigurationType> SupportedPrimaryViewConfigurationTypes;
         std::vector<XrViewConfigurationType> SupportedSecondaryViewConfigurationTypes;
-        std::unordered_map<XrViewConfigurationType, xr::ViewProperties> ViewProperties;
+        std::unordered_map<XrViewConfigurationType, sample::ViewProperties> ViewProperties;
     };
 
     inline std::optional<sample::SystemContext>
@@ -63,11 +63,11 @@ namespace sample {
                 continue; // The system doesn't support this view configuration
             }
 
-            auto viewProperties = xr::CreateViewProperties(instance, system.Id, viewConfigType, appSupportedEnvironmentBlendMode);
+            auto viewProperties = sample::CreateViewProperties(instance, system.Id, viewConfigType, appSupportedEnvironmentBlendMode);
             if (viewProperties.SupportedBlendModes.size() > 0) {
                 system.ViewProperties.emplace(viewConfigType, viewProperties);
 
-                if (xr::IsPrimaryViewConfigurationType(viewConfigType)) {
+                if (sample::IsPrimaryViewConfigurationType(viewConfigType)) {
                     system.SupportedPrimaryViewConfigurationTypes.push_back(viewConfigType);
                 } else {
                     system.SupportedSecondaryViewConfigurationTypes.push_back(viewConfigType);

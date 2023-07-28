@@ -63,10 +63,10 @@ namespace {
             referenceSpaceCreateInfo.poseInReferenceSpace = Pose::Identity();
 
             referenceSpaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
-            CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &referenceSpaceCreateInfo, m_localSpace.Put(xrDestroySpace)));
+            CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &referenceSpaceCreateInfo, m_localSpace.Put()));
 
             referenceSpaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
-            CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &referenceSpaceCreateInfo, m_viewSpace.Put(xrDestroySpace)));
+            CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &referenceSpaceCreateInfo, m_viewSpace.Put()));
 
             // Create an axis at the origin of the LOCAL space
             m_holograms.emplace_back(m_localSpace.Get(),
@@ -74,7 +74,7 @@ namespace {
 
             if (m_context.Extensions.SupportsUnboundedSpace) {
                 referenceSpaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_UNBOUNDED_MSFT;
-                CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &referenceSpaceCreateInfo, m_unboundedSpace.Put(xrDestroySpace)));
+                CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &referenceSpaceCreateInfo, m_unboundedSpace.Put()));
 
                 // Create a thin axis at the origin of the UNBOUNDED space
                 m_holograms.emplace_back(m_unboundedSpace.Get(),
@@ -88,9 +88,9 @@ namespace {
             // Place the cursor in front of hand so that the cubes can be created on the surface.
             spaceCreateInfo.poseInActionSpace = Pose::Translation({0, 0, -0.05f});
             spaceCreateInfo.subactionPath = m_context.Instance.RightHandPath;
-            CHECK_XRCMD(xrCreateActionSpace(m_context.Session.Handle, &spaceCreateInfo, m_rightAimSpace.Put(xrDestroySpace)));
+            CHECK_XRCMD(xrCreateActionSpace(m_context.Session.Handle, &spaceCreateInfo, m_rightAimSpace.Put()));
             spaceCreateInfo.subactionPath = m_context.Instance.LeftHandPath;
-            CHECK_XRCMD(xrCreateActionSpace(m_context.Session.Handle, &spaceCreateInfo, m_leftAimSpace.Put(xrDestroySpace)));
+            CHECK_XRCMD(xrCreateActionSpace(m_context.Session.Handle, &spaceCreateInfo, m_leftAimSpace.Put()));
 
             m_holograms.emplace_back(m_rightAimSpace.Get(),
                                      AddObject(engine::CreateSphere(m_context.PbrResources, 0.05f, 20, Pbr::FromSRGB(Colors::Magenta))));
@@ -195,8 +195,8 @@ namespace {
                 createInfo.pose = spaceLocation.pose;
                 createInfo.time = time;
 
-                XrResult result = xrCreateSpatialAnchorMSFT(
-                    m_context.Session.Handle, &createInfo, anchorSpace.Anchor.Put(xrDestroySpatialAnchorMSFT));
+                XrResult result = m_context.Extensions.xrCreateSpatialAnchorMSFT(
+                    m_context.Session.Handle, &createInfo, anchorSpace.Anchor.Put(m_context.Extensions.xrDestroySpatialAnchorMSFT));
                 if (result == XR_ERROR_CREATE_SPATIAL_ANCHOR_FAILED_MSFT) {
                     // Cannot create spatial anchor at this place
                     return XR_NULL_HANDLE;
@@ -210,7 +210,7 @@ namespace {
                 createInfo.anchor = anchorSpace.Anchor.Get();
                 createInfo.poseInAnchorSpace = Pose::Identity();
                 CHECK_XRCMD(
-                    xrCreateSpatialAnchorSpaceMSFT(m_context.Session.Handle, &createInfo, anchorSpace.Space.Put(xrDestroySpace)));
+                    m_context.Extensions.xrCreateSpatialAnchorSpaceMSFT(m_context.Session.Handle, &createInfo, anchorSpace.Space.Put()));
             }
 
             // Keep a copy of the handles to keep the anchor and space alive.

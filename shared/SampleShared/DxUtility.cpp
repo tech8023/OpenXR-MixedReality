@@ -4,7 +4,6 @@
 #include "pch.h"
 #include "DxUtility.h"
 #include "Trace.h"
-#include <XrUtility/XrString.h>
 
 namespace sample::dx {
     winrt::com_ptr<IDXGIAdapter1> GetAdapter(LUID adapterId) {
@@ -20,14 +19,14 @@ namespace sample::dx {
             DXGI_ADAPTER_DESC1 adapterDesc;
             CHECK_HRCMD(dxgiAdapter->GetDesc1(&adapterDesc));
             if (memcmp(&adapterDesc.AdapterLuid, &adapterId, sizeof(adapterId)) == 0) {
-                sample::Trace("Using graphics adapter {}",  xr::wide_to_utf8(adapterDesc.Description));
+                sample::Trace(L"Using graphics adapter {}", adapterDesc.Description);
                 return dxgiAdapter;
             }
         }
     }
 
-    std::tuple<winrt::com_ptr<ID3D11Device>, winrt::com_ptr<ID3D11DeviceContext>> CreateD3D11DeviceAndContext(
-        IDXGIAdapter1* adapter, const std::vector<D3D_FEATURE_LEVEL>& featureLevels, bool singleThreadedD3D11Device) {
+    std::tuple<winrt::com_ptr<ID3D11Device>, winrt::com_ptr<ID3D11DeviceContext>>
+    CreateD3D11DeviceAndContext(IDXGIAdapter1* adapter, const std::vector<D3D_FEATURE_LEVEL>& featureLevels, bool singleThreadedD3D11Device) {
         UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
         if (singleThreadedD3D11Device) {
@@ -110,7 +109,7 @@ namespace sample::dx {
             swapchainCreateInfo.next = &secondaryViewConfigCreateInfo;
         }
 
-        CHECK_XRCMD(xrCreateSwapchain(session, &swapchainCreateInfo, swapchain.Handle.Put(xrDestroySwapchain)));
+        CHECK_XRCMD(xrCreateSwapchain(session, &swapchainCreateInfo, swapchain.Handle.Put()));
 
         uint32_t chainLength;
         CHECK_XRCMD(xrEnumerateSwapchainImages(swapchain.Handle.Get(), 0, &chainLength, nullptr));
@@ -133,11 +132,11 @@ namespace sample::dx {
         if (!extensions.SupportsD3D11) {
             throw std::exception("The runtime doesn't support D3D11 extensions.");
         }
-        _Analysis_assume_(xrGetD3D11GraphicsRequirementsKHR != nullptr);
+        _Analysis_assume_(extensions.xrGetD3D11GraphicsRequirementsKHR != nullptr);
 
         // Create the D3D11 device for the adapter associated with the system.
         XrGraphicsRequirementsD3D11KHR graphicsRequirements{XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR};
-        CHECK_XRCMD(xrGetD3D11GraphicsRequirementsKHR(instance, systemId, &graphicsRequirements));
+        CHECK_XRCMD(extensions.xrGetD3D11GraphicsRequirementsKHR(instance, systemId, &graphicsRequirements));
         const winrt::com_ptr<IDXGIAdapter1> adapter = sample::dx::GetAdapter(graphicsRequirements.adapterLuid);
 
         // Create a list of feature levels which are both supported by the OpenXR runtime and this application.

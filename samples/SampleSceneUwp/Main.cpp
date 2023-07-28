@@ -40,7 +40,6 @@ namespace {
         appConfig.RequestedExtensions.push_back(XR_MSFT_HAND_INTERACTION_EXTENSION_NAME);
         appConfig.RequestedExtensions.push_back(XR_EXT_HAND_INTERACTION_EXTENSION_NAME);
         appConfig.RequestedExtensions.push_back(XR_EXT_HAND_TRACKING_EXTENSION_NAME);
-        appConfig.RequestedExtensions.push_back(XR_EXT_HAND_JOINTS_MOTION_RANGE_EXTENSION_NAME);
         appConfig.RequestedExtensions.push_back(XR_MSFT_HAND_TRACKING_MESH_EXTENSION_NAME);
 
         // NOTE: Uncomment a filter below to test specific action binding of given profile.
@@ -122,7 +121,7 @@ namespace {
         }
 
         void OnKeyDown(windows::CoreWindow const& sender, windows::KeyEventArgs const& args) {
-            sample::Trace("OnKeyDown : 0x{:x}", (int)args.VirtualKey());
+            sample::Trace("OnKeyDown : 0x{:x}", args.VirtualKey());
 
             // This sample toggles the software keyboard in HMD using space key
             if (args.VirtualKey() == winrt::Windows::System::VirtualKey::Space) {

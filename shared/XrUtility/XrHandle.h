@@ -3,27 +3,25 @@
 
 #pragma once
 
-#include <cassert>
-
 namespace xr {
 
     template <typename HandleType>
-    class UniqueXrHandle {
+    class UniqueExtHandle {
         using PFN_DestroyFunction = XrResult(XRAPI_PTR*)(HandleType);
 
     public:
-        UniqueXrHandle() = default;
-        UniqueXrHandle(const UniqueXrHandle&) = delete;
-        UniqueXrHandle(UniqueXrHandle&& other) noexcept {
+        UniqueExtHandle() = default;
+        UniqueExtHandle(const UniqueExtHandle&) = delete;
+        UniqueExtHandle(UniqueExtHandle&& other) noexcept {
             *this = std::move(other);
         }
 
-        ~UniqueXrHandle() noexcept {
+        ~UniqueExtHandle() noexcept {
             Reset();
         }
 
-        UniqueXrHandle& operator=(const UniqueXrHandle&) = delete;
-        UniqueXrHandle& operator=(UniqueXrHandle&& other) noexcept {
+        UniqueExtHandle& operator=(const UniqueExtHandle&) = delete;
+        UniqueExtHandle& operator=(UniqueExtHandle&& other) noexcept {
             if (m_handle != other.m_handle || m_destroyer != other.m_destroyer) {
                 Reset();
 
@@ -36,11 +34,11 @@ namespace xr {
             return *this;
         }
 
-        bool operator==(const UniqueXrHandle& other) noexcept {
+        bool operator==(const UniqueExtHandle& other) noexcept {
             return m_handle == other.m_handle;
         }
 
-        bool operator!=(const UniqueXrHandle& other) noexcept {
+        bool operator!=(const UniqueExtHandle& other) noexcept {
             return m_handle != other.m_handle;
         }
 
@@ -74,13 +72,21 @@ namespace xr {
         PFN_DestroyFunction m_destroyer{nullptr};
     };
 
-    class ActionHandle : public UniqueXrHandle<XrAction> {};
-    class ActionSetHandle : public UniqueXrHandle<XrActionSet> {};
-    class InstanceHandle : public UniqueXrHandle<XrInstance> {};
-    class SessionHandle : public UniqueXrHandle<XrSession> {};
-    class SpaceHandle : public UniqueXrHandle<XrSpace> {};
-    class SwapchainHandle : public UniqueXrHandle<XrSwapchain> {};
-    class SpatialAnchorHandle : public UniqueXrHandle<XrSpatialAnchorMSFT> {};
-    class HandTrackerHandle : public UniqueXrHandle<XrHandTrackerEXT> {};
+    template <typename HandleType, XrResult(XRAPI_PTR* DestroyFunction)(HandleType)>
+    class UniqueHandle : public UniqueExtHandle<HandleType> {
+    public:
+        HandleType* Put() noexcept {
+            return UniqueExtHandle<HandleType>::Put(DestroyFunction);
+        }
+    };
+
+    class ActionHandle : public UniqueHandle<XrAction, xrDestroyAction> {};
+    class ActionSetHandle : public UniqueHandle<XrActionSet, xrDestroyActionSet> {};
+    class InstanceHandle : public UniqueHandle<XrInstance, xrDestroyInstance> {};
+    class SessionHandle : public UniqueHandle<XrSession, xrDestroySession> {};
+    class SpaceHandle : public UniqueHandle<XrSpace, xrDestroySpace> {};
+    class SwapchainHandle : public UniqueHandle<XrSwapchain, xrDestroySwapchain> {};
+    class SpatialAnchorHandle : public UniqueExtHandle<XrSpatialAnchorMSFT> {};
+    class HandTrackerHandle : public UniqueExtHandle<XrHandTrackerEXT> {};
 
 } // namespace xr

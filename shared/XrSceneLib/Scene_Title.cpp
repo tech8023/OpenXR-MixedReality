@@ -22,7 +22,7 @@ namespace {
             XrReferenceSpaceCreateInfo createInfo{XR_TYPE_REFERENCE_SPACE_CREATE_INFO};
             createInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
             createInfo.poseInReferenceSpace = Pose::Identity();
-            CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &createInfo, m_viewSpace.Put(xrDestroySpace)));
+            CHECK_XRCMD(xrCreateReferenceSpace(m_context.Session.Handle, &createInfo, m_viewSpace.Put()));
 
             constexpr float margin = 0.01f;
             constexpr float titleWidth = 0.6f;
@@ -48,15 +48,16 @@ namespace {
                 block.Object->SetParent(m_background);
             };
 
-            m_title.Text = fmt::format("{}, v{}", m_context.Instance.AppInfo.Name, m_context.Instance.AppInfo.Version).c_str();
+            m_title.Text =
+                fmt::format(L"{}, v{}", xr::utf8_to_wide(m_context.Instance.AppInfo.Name), m_context.Instance.AppInfo.Version).c_str();
             textInfo.FontSize = 16.0f;
             placeTextBlock(m_title, margin, titleHeight / 2 - margin * 2);
 
-            m_subtitle.Text = fmt::format("OpenXR API version: {}.{}.{}\n{}, v{}.{}.{}",
+            m_subtitle.Text = fmt::format(L"OpenXR API version: {}.{}.{}\n{}, v{}.{}.{}",
                                           XR_VERSION_MAJOR(XR_CURRENT_API_VERSION),
                                           XR_VERSION_MINOR(XR_CURRENT_API_VERSION),
                                           XR_VERSION_PATCH(XR_CURRENT_API_VERSION),
-                                          m_context.Instance.Properties.runtimeName,
+                                          xr::utf8_to_wide(m_context.Instance.Properties.runtimeName),
                                           XR_VERSION_MAJOR(m_context.Instance.Properties.runtimeVersion),
                                           XR_VERSION_MINOR(m_context.Instance.Properties.runtimeVersion),
                                           XR_VERSION_PATCH(m_context.Instance.Properties.runtimeVersion))
@@ -87,7 +88,7 @@ namespace {
 
     private:
         struct TextBlock {
-            std::string Text;
+            std::wstring Text;
             std::shared_ptr<engine::PbrModelObject> Object;
         };
 

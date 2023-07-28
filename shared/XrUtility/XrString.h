@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include <XrUtility/XrPlatformDependencies.h>
 #include <openxr/openxr.h>
-#include <openxr/openxr_platform.h>
 #include <openxr/openxr_reflection.h>
 
 #include <string>
@@ -28,8 +26,6 @@ namespace xr {
         std::string string;
         string.resize(count);
         CHECK_XRCMD(xrPathToString(instance, path, count, &count, string.data()));
-        // Remove the null character
-        string.resize(count - 1);
         return string;
     }
 
@@ -37,7 +33,7 @@ namespace xr {
         std::vector<XrPath> paths;
 
         for (auto string : strings) {
-            paths.push_back(xr::StringToPath(instance, string.c_str()));
+            paths.push_back(StringToPath(instance, string.c_str()));
         }
 
         return paths;
